@@ -6,7 +6,7 @@
 class Mountain :
     public Drawable
 {
-protected:
-    void build(glm::vec4 colors(int i, int n)) override;
+public:
+    Mountain(int n, glm::vec4 colors(int i, int n));
 };
 

@@ -1,6 +1,6 @@
 #include "Mountain.h"
 
-void Mountain::build(glm::vec4 colors(int i, int n))
+Mountain::Mountain(int n, glm::vec4 colors(int i, int n)) : Drawable::Drawable(n)
 {
 	float stepA = (2 * PI) / this->nTriangles;
 

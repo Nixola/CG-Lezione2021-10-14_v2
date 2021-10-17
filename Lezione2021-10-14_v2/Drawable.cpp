@@ -1,9 +1,8 @@
 #include "Drawable.h"
 
-Drawable::Drawable(int n, glm::vec4 colors(int i, int n))
+Drawable::Drawable(int n)
 {
 	this->nTriangles = n;
-	this->build(colors);
 	this->initVao();
 }
 

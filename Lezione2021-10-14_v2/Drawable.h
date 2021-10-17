@@ -29,13 +29,12 @@ protected:
 	std::vector<glm::vec4> colors;
 
 	void setDrawMode(GLenum mode);
-	virtual void build(glm::vec4 colors(int i, int n)) = 0;
 	void initVao(void);
+	Drawable(int n);
 
 public:
 	char* _name;
 
-	Drawable(int n, glm::vec4 colors(int i, int n));
 
 	void draw(void);
 	void draw(glm::vec2 pos);
