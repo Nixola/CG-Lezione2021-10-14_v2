@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="Fan.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mountain.cpp" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="Circle.h" />
     <ClInclude Include="Drawable.h" />
+    <ClInclude Include="Fan.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mountain.h" />
     <ClInclude Include="Rectangle.h" />
