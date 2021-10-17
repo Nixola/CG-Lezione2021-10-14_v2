@@ -2,33 +2,33 @@
 
 Drawable::Drawable(int n)
 {
-	this->nTriangles = n;
+	this->_nTriangles = n;
 	this->initVao();
 }
 
 void Drawable::setDrawMode(GLenum mode)
 {
-	this->drawMode = mode;
+	this->_drawMode = mode;
 }
 
 void Drawable::initVao(void)
 {
-	glGenVertexArrays(1, &this->VAO);
-	glBindVertexArray(this->VAO);
+	glGenVertexArrays(1, &this->_VAO);
+	glBindVertexArray(this->_VAO);
 	//Initialize geometry VBO
-	glGenBuffers(1, &this->geometryVBO);
+	glGenBuffers(1, &this->_geometryVBO);
 	//Bind the VBO for sending/setting data
-	glBindBuffer(GL_ARRAY_BUFFER, this->geometryVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->_geometryVBO);
 	//Send data to VBO
-	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(glm::vec3), this->vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->_vertices.size() * sizeof(glm::vec3), this->_vertices.data(), GL_STATIC_DRAW);
 
 	//Geometry VBO is layer 0
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glGenBuffers(1, &this->colorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->colorVBO);
-	glBufferData(GL_ARRAY_BUFFER, this->colors.size() * sizeof(glm::vec4), this->colors.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &this->_colorVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->_colorVBO);
+	glBufferData(GL_ARRAY_BUFFER, this->_colors.size() * sizeof(glm::vec4), this->_colors.data(), GL_STATIC_DRAW);
 	//Color VBO is layer 1
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
@@ -36,9 +36,9 @@ void Drawable::initVao(void)
 
 void Drawable::draw(void)
 {
-	glBindVertexArray(this->VAO);
-	//glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(this->model.getMatrix()));
-	glDrawArrays(this->drawMode, 0, this->vertices.size());
+	glBindVertexArray(this->_VAO);
+	//glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(this->_model.getMatrix()));
+	glDrawArrays(this->_drawMode, 0, this->_vertices.size());
 }
 
 void Drawable::draw(glm::vec2 pos)
@@ -58,9 +58,9 @@ void Drawable::draw(glm::vec2 pos, glm::vec2 scale, float angle)
 
 void Drawable::draw(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
 {
-	this->modelStack.push(this->model);
-	this->model.transform(pos, scale, angle, offset);
+	this->_modelStack.push(this->_model);
+	this->_model.transform(pos, scale, angle, offset);
 	this->draw();
-	this->model = this->modelStack.top();
-	this->modelStack.pop();
+	this->_model = this->_modelStack.top();
+	this->_modelStack.pop();
 }

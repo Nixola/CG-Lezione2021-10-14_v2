@@ -1,8 +1,6 @@
 #pragma once
 #include "Drawable.h"
 
-#define  PI   3.141592653589793238465
-
 class Mountain :
     public Drawable
 {
