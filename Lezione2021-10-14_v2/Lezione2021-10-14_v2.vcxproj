@@ -146,6 +146,8 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mountain.cpp" />
     <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ShaderMaker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circle.h" />
@@ -154,6 +156,8 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mountain.h" />
     <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="ShaderMaker.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
