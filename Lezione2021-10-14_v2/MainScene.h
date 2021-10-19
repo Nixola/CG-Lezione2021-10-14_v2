@@ -5,10 +5,10 @@
 #include "Drawable.h"
 
 class MainScene :
-    public Scene
+    public Spite::Scene
 {
 private:
-    std::vector<std::unique_ptr<Drawable>> _drawables;
+    std::vector<std::unique_ptr<Spite::Drawable>> _drawables;
 public:
     void load();
     void update(float dt);

@@ -1,17 +1,17 @@
 #include "Drawable.h"
 
-Drawable::Drawable(int n)
+Spite::Drawable::Drawable(int n)
 {
 	this->_nTriangles = n;
 	this->initVao();
 }
 
-void Drawable::setDrawMode(GLenum mode)
+void Spite::Drawable::setDrawMode(GLenum mode)
 {
 	this->_drawMode = mode;
 }
 
-void Drawable::initVao(void)
+void Spite::Drawable::initVao(void)
 {
 	glGenVertexArrays(1, &this->_VAO);
 	glBindVertexArray(this->_VAO);
@@ -34,29 +34,29 @@ void Drawable::initVao(void)
 	glEnableVertexAttribArray(1);
 }
 
-void Drawable::draw(void)
+void Spite::Drawable::draw(void)
 {
 	glBindVertexArray(this->_VAO);
 	//glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(this->_model.getMatrix()));
 	glDrawArrays(this->_drawMode, 0, this->_vertices.size());
 }
 
-void Drawable::draw(glm::vec2 pos)
+void Spite::Drawable::draw(glm::vec2 pos)
 {
 	this->draw(pos, glm::vec2(0.0), 0.0, glm::vec2(0.0));
 }
 
-void Drawable::draw(glm::vec2 pos, glm::vec2 scale)
+void Spite::Drawable::draw(glm::vec2 pos, glm::vec2 scale)
 {
 	this->draw(pos, scale, 0.0, glm::vec2(0.0));
 }
 
-void Drawable::draw(glm::vec2 pos, glm::vec2 scale, float angle)
+void Spite::Drawable::draw(glm::vec2 pos, glm::vec2 scale, float angle)
 {
 	this->draw(pos, scale, angle, glm::vec2(0.0));
 }
 
-void Drawable::draw(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
+void Spite::Drawable::draw(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
 {
 	this->_modelStack.push(this->_model);
 	this->_model.transform(pos, scale, angle, offset);

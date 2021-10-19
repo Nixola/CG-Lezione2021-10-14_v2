@@ -1,6 +1,6 @@
 #include "Model.h"
 
-void Model::update(void)
+void Spite::Model::update(void)
 {
     this->_matrix = glm::translate(glm::mat4(1.0), glm::vec3(this->_pos, 0.0));
     this->_matrix = glm::rotate(this->_matrix, this->_angle, glm::vec3(0.0,0.0,1.0));
@@ -8,33 +8,33 @@ void Model::update(void)
     this->_matrix = glm::scale(this->_matrix, glm::vec3(this->_scale, 1.0));
 }
 
-glm::mat4 Model::getMatrix()
+glm::mat4 Spite::Model::getMatrix()
 {
     this->update();
     return this->_matrix;
 }
 
-void Model::translate(glm::vec2 pos)
+void Spite::Model::translate(glm::vec2 pos)
 {
     this->_pos += pos;
 }
 
-void Model::scale(glm::vec2 scale)
+void Spite::Model::scale(glm::vec2 scale)
 {
     this->_scale *= scale;
 }
 
-void Model::rotate(float angle)
+void Spite::Model::rotate(float angle)
 {
     this->_angle += angle;
 }
 
-void Model::offset(glm::vec2 offset)
+void Spite::Model::offset(glm::vec2 offset)
 {
     this->_offset += offset;
 }
 
-void Model::transform(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
+void Spite::Model::transform(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
 {
     this->translate(pos);
     this->scale(scale);
@@ -42,27 +42,27 @@ void Model::transform(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 off
     this->offset(offset);
 }
 
-void Model::setPos(glm::vec2 pos)
+void Spite::Model::setPos(glm::vec2 pos)
 {
     this->_pos = pos;
 }
 
-void Model::setScale(glm::vec2 scale)
+void Spite::Model::setScale(glm::vec2 scale)
 {
     this->_scale = scale;
 }
 
-void Model::setAngle(float angle)
+void Spite::Model::setAngle(float angle)
 {
     this->_angle = angle;
 }
 
-void Model::setOffset(glm::vec2 offset)
+void Spite::Model::setOffset(glm::vec2 offset)
 {
     this->_offset = offset;
 }
 
-void Model::set(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
+void Spite::Model::set(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
 {
     this->setPos(pos);
     this->setScale(scale);
@@ -70,7 +70,7 @@ void Model::set(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
     this->setOffset(offset);
 }
 
-Model::Model(void)
+Spite::Model::Model(void)
 {
     this->_pos = glm::vec2(0.0);
     this->_scale = glm::vec2(0.0);
@@ -79,22 +79,22 @@ Model::Model(void)
     this->_matrix = glm::mat4(1.0);
 }
 
-Model::Model(glm::vec2 pos) : Model()
+Spite::Model::Model(glm::vec2 pos) : Spite::Model()
 {
     this->setPos(pos);
 }
 
-Model::Model(glm::vec2 pos, glm::vec2 scale) : Model(pos)
+Spite::Model::Model(glm::vec2 pos, glm::vec2 scale) : Spite::Model(pos)
 {
     this->setScale(scale);
 }
 
-Model::Model(glm::vec2 pos, glm::vec2 scale, float angle) : Model(pos, scale)
+Spite::Model::Model(glm::vec2 pos, glm::vec2 scale, float angle) : Spite::Model(pos, scale)
 {
     this->setAngle(angle);
 }
 
-Model::Model(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset) : Model(pos, scale, angle)
+Spite::Model::Model(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset) : Spite::Model(pos, scale, angle)
 {
     this->setOffset(offset);
 }

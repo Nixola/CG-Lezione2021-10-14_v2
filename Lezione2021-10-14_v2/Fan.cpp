@@ -1,6 +1,6 @@
 #include "Fan.h"
 
-Fan::Fan(glm::vec4 colors(int i, int n)) : Drawable::Drawable(4)
+Spite::Fan::Fan(glm::vec4 colors(int i, int n)) : Drawable::Drawable(4)
 {
 	float v1 = cos(glm::radians(70.0));
 	float v2 = sin(glm::radians(70.0));

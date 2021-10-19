@@ -4,7 +4,7 @@
 #include <fstream>
 
 #pragma warning(disable:4996)
-char* ShaderMaker::readShaderSource(const char* shaderFile)
+char* Spite::ShaderMaker::readShaderSource(const char* shaderFile)
 {
 	FILE* fp = fopen(shaderFile, "rb");
 
@@ -23,7 +23,7 @@ char* ShaderMaker::readShaderSource(const char* shaderFile)
 	return buf;
 }
 
-GLuint ShaderMaker::createProgram(char* vertexfilename, char* fragmentfilename)
+GLuint Spite::ShaderMaker::createProgram(char* vertexfilename, char* fragmentfilename)
 {
 	GLenum ErrorCheckValue = glGetError();
 	int success;

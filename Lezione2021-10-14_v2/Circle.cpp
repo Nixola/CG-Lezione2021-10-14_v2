@@ -1,6 +1,6 @@
 #include "Circle.h"
 
-Circle::Circle(int n, glm::vec4 colors(int i, int n)) : Drawable::Drawable(n)
+Spite::Circle::Circle(int n, glm::vec4 colors(int i, int n)) : Drawable::Drawable(n)
 {
 	float stepA = (2 * PI) / _nTriangles;
 	_vertices.push_back(glm::vec3(0.0, 0.0, 0.0));

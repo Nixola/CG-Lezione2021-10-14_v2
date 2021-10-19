@@ -1,6 +1,6 @@
 #include "Mountain.h"
 
-Mountain::Mountain(int n, glm::vec4 colors(int i, int n)) : Drawable::Drawable(n)
+Spite::Mountain::Mountain(int n, glm::vec4 colors(int i, int n)) : Spite::Drawable::Drawable(n)
 {
 	float stepA = (2 * PI) / this->_nTriangles;
 

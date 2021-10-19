@@ -1,6 +1,6 @@
 #include "Rectangle.h"
 
-Rectangle::Rectangle(int n, glm::vec4 colors(int i, int n)) : Drawable::Drawable(n)
+Spite::Rectangle::Rectangle(int n, glm::vec4 colors(int i, int n)) : Spite::Drawable::Drawable(n)
 {
 	for (int i = 0; i < this->_nTriangles; i++)
 	{
