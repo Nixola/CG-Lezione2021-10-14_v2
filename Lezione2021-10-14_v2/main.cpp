@@ -2,11 +2,12 @@
 //
 
 #include <iostream>
-#include "Drawable.h"
+#include "MainScene.h"
+#include "Spite.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    std::cout << "Hello World!\n";
+    Spite::Spite::get().start(&argc, argv, 1280, 720, "Lab 2021-10-14", new MainScene());
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

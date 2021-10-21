@@ -6,7 +6,7 @@ namespace Spite {
 	class ShaderMaker
 	{
 	public:
-		static GLuint createProgram(char* vertexfilename, char* fragmentfilename);
+		static GLuint createProgram(const char* vertexfilename, const char* fragmentfilename);
 
 	private:
 		ShaderMaker() { }

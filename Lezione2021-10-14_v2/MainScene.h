@@ -10,13 +10,14 @@ class MainScene :
 private:
     std::vector<std::unique_ptr<Spite::Drawable>> _drawables;
 public:
-    void load();
-    void update(float dt);
+    void load(const int screenWidth, const int screenHeight);
+    void update(const float dt);
     void draw();
-    void mousePressed(int b, int x, int y);
-    void mouseReleased(int b, int x, int y);
-    void mouseMoved(int x, int y, int dx, int dy);
-    void keyPressed(int key);
-    void keyReleased(int key);
+    void mousePressed(const int b, const int x, const int y);
+    void mouseReleased(const int b, const int x, const int y);
+    void mouseMoved(const int x, const int y, const int dx, const int dy);
+    void keyPressed(const int key);
+    void keyReleased(const int key);
+    void resize(const int w, const int h);
 };
 

@@ -4,7 +4,7 @@ void Spite::Model::update(void)
 {
     this->_matrix = glm::translate(glm::mat4(1.0), glm::vec3(this->_pos, 0.0));
     this->_matrix = glm::rotate(this->_matrix, this->_angle, glm::vec3(0.0,0.0,1.0));
-    this->_matrix = glm::translate(this->_matrix, glm::vec3(-this->_offset, 1.0));
+    this->_matrix = glm::translate(this->_matrix, glm::vec3(-this->_offset, 0.0));
     this->_matrix = glm::scale(this->_matrix, glm::vec3(this->_scale, 1.0));
 }
 

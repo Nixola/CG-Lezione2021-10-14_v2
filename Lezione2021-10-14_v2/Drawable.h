@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include <stack>
+#include <string>
 #include "Model.h"
 
 #define  PI   3.141592653589793238465
@@ -35,7 +36,19 @@ namespace Spite {
 		Drawable(int n);
 
 	public:
-		char* _name;
+		std::string _name;
+
+		void translate(glm::vec2 pos);
+		void scale(glm::vec2 scale);
+		void rotate(float angle);
+		void offset(glm::vec2 offset);
+		void transform(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset);
+
+		void setPos(glm::vec2 pos);
+		void setScale(glm::vec2 scale);
+		void setAngle(float angle);
+		void setOffset(glm::vec2 offset);
+		void set(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset);
 
 
 		void draw(void);

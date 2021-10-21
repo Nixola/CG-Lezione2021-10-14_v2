@@ -45,6 +45,12 @@
     <ClCompile Include="MainScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Spite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EmptyScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Drawable.h">
@@ -74,8 +80,20 @@
     <ClInclude Include="MainScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Spite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmptyScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="vertexShader_M.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragmentShader_M.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

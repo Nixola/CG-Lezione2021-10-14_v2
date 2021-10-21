@@ -23,7 +23,7 @@ char* Spite::ShaderMaker::readShaderSource(const char* shaderFile)
 	return buf;
 }
 
-GLuint Spite::ShaderMaker::createProgram(char* vertexfilename, char* fragmentfilename)
+GLuint Spite::ShaderMaker::createProgram(const char* vertexfilename, const char* fragmentfilename)
 {
 	GLenum ErrorCheckValue = glGetError();
 	int success;

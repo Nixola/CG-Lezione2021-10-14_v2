@@ -1,4 +1,5 @@
 #include "Drawable.h"
+#include "Spite.h"
 
 Spite::Drawable::Drawable(int n)
 {
@@ -6,29 +7,79 @@ Spite::Drawable::Drawable(int n)
 	this->initVao();
 }
 
+void Spite::Drawable::translate(glm::vec2 pos)
+{
+	_model.translate(pos);
+}
+
+void Spite::Drawable::scale(glm::vec2 scale)
+{
+	_model.scale(scale);
+}
+
+void Spite::Drawable::rotate(float angle)
+{
+	_model.rotate(angle);
+}
+
+void Spite::Drawable::offset(glm::vec2 offset)
+{
+	_model.offset(offset);
+}
+
+void Spite::Drawable::transform(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
+{
+	_model.transform(pos, scale, angle, offset);
+}
+
+void Spite::Drawable::setPos(glm::vec2 pos)
+{
+	_model.setPos(pos);
+}
+
+void Spite::Drawable::setScale(glm::vec2 scale)
+{
+	_model.setScale(scale);
+}
+
+void Spite::Drawable::setAngle(float angle)
+{
+	_model.setAngle(angle);
+}
+
+void Spite::Drawable::setOffset(glm::vec2 offset)
+{
+	_model.setOffset(offset);
+}
+
+void Spite::Drawable::set(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
+{
+	_model.set(pos, scale, angle, offset);
+}
+
 void Spite::Drawable::setDrawMode(GLenum mode)
 {
 	this->_drawMode = mode;
 }
 
-void Spite::Drawable::initVao(void)
+void Spite::Drawable::initVao(void) 
 {
-	glGenVertexArrays(1, &this->_VAO);
-	glBindVertexArray(this->_VAO);
+	glGenVertexArrays(1, &_VAO);
+	glBindVertexArray(_VAO);
 	//Initialize geometry VBO
-	glGenBuffers(1, &this->_geometryVBO);
+	glGenBuffers(1, &_geometryVBO);
 	//Bind the VBO for sending/setting data
-	glBindBuffer(GL_ARRAY_BUFFER, this->_geometryVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _geometryVBO);
 	//Send data to VBO
-	glBufferData(GL_ARRAY_BUFFER, this->_vertices.size() * sizeof(glm::vec3), this->_vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(glm::vec3), _vertices.data(), GL_STATIC_DRAW);
 
 	//Geometry VBO is layer 0
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glGenBuffers(1, &this->_colorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->_colorVBO);
-	glBufferData(GL_ARRAY_BUFFER, this->_colors.size() * sizeof(glm::vec4), this->_colors.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &_colorVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _colorVBO);
+	glBufferData(GL_ARRAY_BUFFER, _colors.size() * sizeof(glm::vec4), _colors.data(), GL_STATIC_DRAW);
 	//Color VBO is layer 1
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
@@ -37,6 +88,7 @@ void Spite::Drawable::initVao(void)
 void Spite::Drawable::draw(void)
 {
 	glBindVertexArray(this->_VAO);
+	Spite::get().sendModel(_model.getMatrix());
 	//glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(this->_model.getMatrix()));
 	glDrawArrays(this->_drawMode, 0, this->_vertices.size());
 }

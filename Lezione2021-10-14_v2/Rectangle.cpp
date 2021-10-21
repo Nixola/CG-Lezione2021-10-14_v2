@@ -11,4 +11,5 @@ Spite::Rectangle::Rectangle(int n, glm::vec4 colors(int i, int n)) : Spite::Draw
 		this->_colors.push_back(colors(i, this->_nTriangles));
 	}
 	this->setDrawMode(GL_TRIANGLE_STRIP);
+	this->initVao();
 }

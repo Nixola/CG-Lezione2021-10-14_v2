@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="EmptyScene.cpp" />
     <ClCompile Include="Fan.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScene.cpp" />
@@ -149,10 +150,12 @@
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderMaker.cpp" />
+    <ClCompile Include="Spite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circle.h" />
     <ClInclude Include="Drawable.h" />
+    <ClInclude Include="EmptyScene.h" />
     <ClInclude Include="Fan.h" />
     <ClInclude Include="MainScene.h" />
     <ClInclude Include="Model.h" />
@@ -160,9 +163,12 @@
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderMaker.h" />
+    <ClInclude Include="Spite.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="fragmentShader_M.glsl" />
     <None Include="packages.config" />
+    <None Include="vertexShader_M.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
