@@ -1,4 +1,5 @@
 #include <chrono>
+#include <ctype.h>
 
 #include "Spite.h"
 #include "EmptyScene.h"
@@ -55,6 +56,11 @@ void Spite::Spite::loadScene(Scene *scene)
 {
 	_scene.reset(scene);
 	_scene->load(_width, _height);
+}
+
+bool Spite::Spite::isDown(const int key)
+{
+	return _keys.count(key) > 0;
 }
 
 void Spite::Spite::sendModel(glm::mat4 model)
@@ -114,21 +120,29 @@ void Spite::Spite::draw()
 
 void Spite::Spite::keyboard(unsigned char key, int x, int y)
 {
+	key = tolower(key);
+	Spite::get()._keys.insert(key);
 	Spite::get()._scene->keyPressed(key);
 }
 
 void Spite::Spite::keyboardUp(unsigned char key, int x, int y)
 {
+	key = tolower(key);
+	Spite::get()._keys.erase(key);
 	Spite::get()._scene->keyReleased(key);
 }
 
 void Spite::Spite::special(int key, int x, int y)
 {
-	Spite::get()._scene->keyPressed(key + 256);
+	key = key + 256;
+	Spite::get()._keys.insert(key);
+	Spite::get()._scene->keyPressed(key);
 }
 
 void Spite::Spite::specialUp(int key, int x, int y)
 {
+	key = key + 256;
+	Spite::get()._keys.erase(key);
 	Spite::get()._scene->keyReleased(key + 256);
 }
 

@@ -14,6 +14,22 @@ glm::mat4 Spite::Model::getMatrix()
     return this->_matrix;
 }
 
+glm::vec2 Spite::Model::getPos() {
+    return _pos;
+}
+
+glm::vec2 Spite::Model::getScale() {
+    return _scale;
+}
+
+float Spite::Model::getAngle() {
+    return _angle;
+}
+
+glm::vec2 Spite::Model::getOffset() {
+    return _offset;
+}
+
 void Spite::Model::translate(glm::vec2 pos)
 {
     this->_pos += pos;

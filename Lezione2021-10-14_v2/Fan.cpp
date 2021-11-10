@@ -33,4 +33,5 @@ Spite::Fan::Fan(glm::vec4 colors(int i, int n)) : Drawable::Drawable(4)
 	_colors.push_back(colors(11, 12));
 
 	setDrawMode(GL_TRIANGLES);
+	initVao();
 }

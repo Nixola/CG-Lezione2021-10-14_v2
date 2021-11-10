@@ -7,26 +7,38 @@ Spite::Drawable::Drawable(int n)
 	this->initVao();
 }
 
+glm::vec2 Spite::Drawable::getPos() {
+	return _model.getPos();
+}
+
+glm::vec2 Spite::Drawable::getScale() {
+	return _model.getScale();
+}
+
+float Spite::Drawable::getAngle() {
+	return _model.getAngle();
+}
+
+glm::vec2 Spite::Drawable::getOffset() {
+	return _model.getOffset();
+}
+
 void Spite::Drawable::translate(glm::vec2 pos)
 {
 	_model.translate(pos);
 }
-
 void Spite::Drawable::scale(glm::vec2 scale)
 {
 	_model.scale(scale);
 }
-
 void Spite::Drawable::rotate(float angle)
 {
 	_model.rotate(angle);
 }
-
 void Spite::Drawable::offset(glm::vec2 offset)
 {
 	_model.offset(offset);
 }
-
 void Spite::Drawable::transform(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset)
 {
 	_model.transform(pos, scale, angle, offset);
@@ -89,7 +101,6 @@ void Spite::Drawable::draw(void)
 {
 	glBindVertexArray(this->_VAO);
 	Spite::get().sendModel(_model.getMatrix());
-	//glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(this->_model.getMatrix()));
 	glDrawArrays(this->_drawMode, 0, this->_vertices.size());
 }
 

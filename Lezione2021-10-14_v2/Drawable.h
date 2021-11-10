@@ -38,6 +38,11 @@ namespace Spite {
 	public:
 		std::string _name;
 
+		glm::vec2 getPos();
+		glm::vec2 getScale();
+		float getAngle();
+		glm::vec2 getOffset();
+
 		void translate(glm::vec2 pos);
 		void scale(glm::vec2 scale);
 		void rotate(float angle);

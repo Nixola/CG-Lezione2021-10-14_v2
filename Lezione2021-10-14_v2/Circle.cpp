@@ -12,4 +12,5 @@ Spite::Circle::Circle(int n, glm::vec4 colors(int i, int n)) : Drawable::Drawabl
 		_colors.push_back(colors(i, _nTriangles));
 	}
 	setDrawMode(GL_TRIANGLE_FAN);
+	initVao();
 }

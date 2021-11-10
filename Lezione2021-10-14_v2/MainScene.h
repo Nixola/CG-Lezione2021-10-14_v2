@@ -8,7 +8,17 @@ class MainScene :
     public Spite::Scene
 {
 private:
-    std::vector<std::unique_ptr<Spite::Drawable>> _drawables;
+    std::vector<std::unique_ptr<Spite::Drawable>> _mountains;
+    std::vector<std::unique_ptr<Spite::Drawable>> _fans;
+    std::vector<std::unique_ptr<Spite::Drawable>> _poles;
+    std::unique_ptr<Spite::Drawable> _sky;
+    std::unique_ptr<Spite::Drawable> _grass;
+    std::unique_ptr<Spite::Drawable> _ball;
+    std::unique_ptr<Spite::Drawable> _shadow;
+    std::unique_ptr<Spite::Drawable> _sun;
+    std::unique_ptr<Spite::Drawable> _flare;
+    glm::vec2 _screenSize;
+
 public:
     void load(const int screenWidth, const int screenHeight);
     void update(const float dt);
