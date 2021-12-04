@@ -222,7 +222,7 @@ void MainScene::mousePressed(const int b, const int x, const int y)
 		}
 		glm::vec2 PoC = pos + dir * closestDistance - dir * std::sin(std::acos(distanceToLine / closest->getRadius())) * closest->getRadius();
 		_lines.push_back(new Spite::Line({ {pos, 0.0}, {1.0,1.0,1.0,1.0}, {0.0,0.0 } }, { {PoC, 0.0}, {1.0,1.0,1.0,1.0}, {0.0,0.0} }));
-		closest->knockback(PoC, closest->getRadius(), dir * 50000.f);
+		closest->knockback(PoC, closest->getRadius(), dir * 100000.f);
 		closest->applyForce(dir * 50000.f);
 		auto hp = _health.find(closest);
 		if (hp != _health.end()) {
