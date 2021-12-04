@@ -9,7 +9,9 @@
 #include <vector>
 #include <stack>
 #include <string>
+
 #include "Model.h"
+#include "Vertex.h"
 
 #define  PI   3.141592653589793238465
 namespace Spite {
@@ -18,8 +20,8 @@ namespace Spite {
 	private:
 		//OpenGL stuff
 		GLuint _VAO;
-		GLuint _geometryVBO;
-		GLuint _colorVBO;
+		GLuint _VBO;
+		GLuint _texture;
 		GLenum _drawMode;
 
 		//model matrix
@@ -28,12 +30,15 @@ namespace Spite {
 
 	protected:
 		int _nTriangles;
-		std::vector<glm::vec3> _vertices;
-		std::vector<glm::vec4> _colors;
+		std::vector<Vertex> _vertexData;
 
 		void setDrawMode(GLenum mode);
-		void initVao(void);
+		void initVao(GLenum hint);
+		void initVao(GLenum hint, GLuint size);
+		void updateVao();
 		Drawable(int n);
+		Drawable(int n, GLenum hint);
+		~Drawable();
 
 	public:
 		std::string _name;
@@ -42,6 +47,8 @@ namespace Spite {
 		glm::vec2 getScale();
 		float getAngle();
 		glm::vec2 getOffset();
+
+		void setTexture(GLuint texture);
 
 		void translate(glm::vec2 pos);
 		void scale(glm::vec2 scale);

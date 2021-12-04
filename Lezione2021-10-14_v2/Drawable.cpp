@@ -1,10 +1,23 @@
 #include "Drawable.h"
 #include "Spite.h"
 
-Spite::Drawable::Drawable(int n)
+#include <iostream>
+
+Spite::Drawable::Drawable(int n) : Drawable(n, GL_STATIC_DRAW)
 {
-	this->_nTriangles = n;
-	this->initVao();
+}
+
+Spite::Drawable::Drawable(int n, GLenum usageHint)
+{
+	_nTriangles = n;
+	setTexture(Spite::Spite::get().getEmptyTexture());
+}
+
+Spite::Drawable::~Drawable()
+{
+	std::cout << "DESTROY" << std::endl;
+	glDeleteBuffers(1, &_VBO);
+	glDeleteVertexArrays(1, &_VAO);
 }
 
 glm::vec2 Spite::Drawable::getPos() {
@@ -21,6 +34,11 @@ float Spite::Drawable::getAngle() {
 
 glm::vec2 Spite::Drawable::getOffset() {
 	return _model.getOffset();
+}
+
+void Spite::Drawable::setTexture(GLuint texture)
+{
+	_texture = texture;
 }
 
 void Spite::Drawable::translate(glm::vec2 pos)
@@ -74,39 +92,52 @@ void Spite::Drawable::setDrawMode(GLenum mode)
 	this->_drawMode = mode;
 }
 
-void Spite::Drawable::initVao(void) 
+
+void Spite::Drawable::initVao(GLenum usageHint) {
+	initVao(usageHint, _vertexData.size());
+}
+void Spite::Drawable::initVao(GLenum usageHint, GLuint size) 
 {
 	glGenVertexArrays(1, &_VAO);
 	glBindVertexArray(_VAO);
-	//Initialize geometry VBO
-	glGenBuffers(1, &_geometryVBO);
-	//Bind the VBO for sending/setting data
-	glBindBuffer(GL_ARRAY_BUFFER, _geometryVBO);
-	//Send data to VBO
-	glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(glm::vec3), _vertices.data(), GL_STATIC_DRAW);
-
-	//Geometry VBO is layer 0
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glGenBuffers(1, &_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof(Vertex), _vertexData.data(), usageHint);
+	//Geometry 
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &_colorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, _colorVBO);
-	glBufferData(GL_ARRAY_BUFFER, _colors.size() * sizeof(glm::vec4), _colors.data(), GL_STATIC_DRAW);
-	//Color VBO is layer 1
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	//Color
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	//Texture
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) (7 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+}
+
+void Spite::Drawable::updateVao()
+{
+	glBindVertexArray(_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, _vertexData.size() * sizeof(Vertex), _vertexData.data());
 }
 
 void Spite::Drawable::draw(void)
 {
+	GLint currentTexture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &currentTexture);
+	if (currentTexture != _texture) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _texture);
+	}
 	glBindVertexArray(this->_VAO);
 	Spite::get().sendModel(_model.getMatrix());
-	glDrawArrays(this->_drawMode, 0, this->_vertices.size());
+	glDrawArrays(_drawMode, 0, _vertexData.size());
 }
 
 void Spite::Drawable::draw(glm::vec2 pos)
 {
-	this->draw(pos, glm::vec2(0.0), 0.0, glm::vec2(0.0));
+	this->draw(pos, glm::vec2(1.0), 0.0, glm::vec2(0.0));
 }
 
 void Spite::Drawable::draw(glm::vec2 pos, glm::vec2 scale)

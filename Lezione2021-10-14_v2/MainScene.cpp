@@ -1,100 +1,242 @@
 #include <memory>
 #include <iostream>
+#include <set>
+#include <limits>
+#include <cstdlib>
+
+#include <glm/gtx/transform.hpp>
+
 #include "MainScene.h"
 #include "Rectangle.h"
-#include "Drawable.h"
-#include "Circle.h"
-#include "Mountain.h"
-#include "Fan.h"
 #include "Spite.h"
+#include "Sprite.h"
+
+#include "Texture.h"
+#include "dirt4.h"
+
+#define SEGMENTS 10
+#define SPRINGFORCE 30
+#define STEPS 3.f
+
+
+MainScene::~MainScene()
+{
+	delete _player;
+	delete _background;
+
+	for (auto dis = _enemies.begin(); dis != _enemies.end(); dis++) {
+		delete* dis;
+	}
+	for (auto dis = _lines.begin(); dis != _lines.end(); dis++) {
+		delete* dis;
+	}
+}
 
 void MainScene::load(const int screenWidth, const int screenHeight)
 {
-	_screenSize = glm::vec2(screenWidth, screenHeight);
-	_sky.reset(new Spite::Rectangle(4, [](int i, int n) { return (i%2==0) ? glm::vec4(0.3, 0.7, 1.0, 1.0) : glm::vec4(0.5, 0.0, 1.0, 1.0); }));
-	_sky->set(glm::vec2(0.0, screenHeight / 2.0), glm::vec2(screenWidth, screenHeight / 2.0), 0, glm::vec2(0.0));
+	_player = new Spite::SoftBody(SEGMENTS, 32, glm::vec2(0), SPRINGFORCE);
+	_health.insert({ _player, 4 });
+	_player->setColor({ 0.8,0.8,0.8,1.0 });
+	_screenSize.x = screenWidth;
+	_screenSize.y = screenHeight;
+	_background = new Spite::Sprite(Texture::load<Texture::Dirt>());
+	_background->setScale(_screenSize * 2.f);
+	_background->setTextureCoordinates(glm::vec2(0.0), _screenSize / 256.f);
 
-	_grass.reset(new Spite::Rectangle(4, [](int i, int n) {return (i + 1 == n) ? glm::vec4(0.7, 1.0, 0.0, 1.0) : glm::vec4(0.0, 0.5, 0.0, 1.0); }));
-	_grass->set(glm::vec2(0.0, 0.0), glm::vec2(screenWidth, screenHeight / 2.0), 0, glm::vec2(0.0));
+	_time = 0;
 
-	for (int i = 0; i < 6; i++) {
-		Spite::Drawable *mountain = new Spite::Mountain(30, [](int i, int n) {return (i % 2 == 0) ? glm::vec4(0.7, 0.5, 0.1, 1.0) : glm::vec4(0.35, 0.1, 0.0, 1.0); });
-		mountain->set(glm::vec2(screenWidth / 6.0 * i, screenHeight / 2.0), glm::vec2(screenWidth / 6.0, 80.0), 0, glm::vec2(0.0));
-		_mountains.push_back(std::unique_ptr<Spite::Drawable>(mountain));
-
-		Spite::Drawable *pole = new Spite::Rectangle(4, [](int i, int n) {return (i % 2 == 0) ? glm::vec4(0.0, 0.6, 0.0, 1.0) : glm::vec4(0.0, 1.0, 0.0, 1.0); });
-		pole->set(glm::vec2(screenWidth / 7.0 * (i + 1), screenHeight / 2.0 + 20), glm::vec2(3.0, 80.0), 0, glm::vec2(1.5, 0.0));
-		_poles.push_back(std::unique_ptr<Spite::Drawable>(pole));
-
-		Spite::Drawable* fan = new Spite::Fan([](int i, int n) {return (i % 3 == 0) ? glm::vec4(0.0, 1.0, 0.0, 1.0) : glm::vec4(1.0, 0.8, 0.0, 1.0); });
-		fan->set(pole->getPos() + glm::vec2(0.0, 80.0), glm::vec2(40.0), rand(), glm::vec2(0.0));
-		_fans.push_back(std::unique_ptr<Spite::Drawable>(fan));
-	}
-
-	_ball.reset(new Spite::Circle(50, [](int i, int n) { return i == -1 ? glm::vec4(1.0, 0.9, 0.0, 1.0) : glm::vec4(1.0, 0.0, 0.0, 1.0); }));
-	_ball->set(glm::vec2(screenWidth / 2.0 - 40.0, screenHeight / 5.0), glm::vec2(50.0), 0, glm::vec2(0.0));
-
-	_shadow.reset(new Spite::Circle(50, [](int i, int n) { return i == -1 ? glm::vec4(0.0, 0.0, 0.0, 0.6) : glm::vec4(0.0); }));
-	_shadow->set(_ball->getPos() - glm::vec2(0, 40), glm::vec2(50.0, 35.0), 0, glm::vec2(0.0));
-
-	_sun.reset(new Spite::Circle(50, [](int i, int n) { return i == -1 ? glm::vec4(1.0, 1.0, 0.0, 1.0) : glm::vec4(1.0); }));
-	_sun->set(glm::vec2(screenWidth / 2.0, screenHeight / 5.0 * 4.0), glm::vec2(40.0), 0, glm::vec2(0.0));
-
-	_flare.reset(new Spite::Circle(50, [](int i, int n) { return i == -1 ? glm::vec4(1.0, 1.0, 0.0, 1.0) : glm::vec4(1.0, 1.0, 1.0, 0.0); }));
-	_flare->set(_sun->getPos(), glm::vec2(80.0), 0, glm::vec2(0.0));
+	Spite::Spite::get().setColor({ 1.0, 1.0, 1.0, 1.0 });
 }
 
-void MainScene::update(const float dt)
+void MainScene::update(float dt)
 {
-	Spite::Spite &s = Spite::Spite::get();
-	static float timer = 0;
-	timer += dt;
+	if (_dead || _pause) return;
+	dt = std::min(dt, 1.f / 30.f);
+	if ((float)rand() / (float)RAND_MAX > std::pow(0.1, dt)) {
+		float a = (float)rand() / (float)RAND_MAX * 2 * PI;
+		Spite::SoftBody* enemy = new Spite::SoftBody(SEGMENTS, 32, glm::vec2(std::cos(a), std::sin(a)) * glm::length(_screenSize) + _player->getPos(), SPRINGFORCE);
+		_health.insert({ enemy, 3 });
+		enemy->setColor({ 0.0, 0.8, 0.0, 1.0 });
+		_enemies.push_back(enemy);
+	}
 
-	for (const auto& it : _fans) {
-		it->rotate(1.0 * dt);
+	dt = dt / STEPS;
+	for (int i = 0; i < STEPS; i++) {
+		_time += dt;
+		Spite::Spite& s = Spite::Spite::get();
+		glm::vec2 force = glm::vec2(0, 0);
+		if (s.isKeyDown('a')) {
+			force.x -= 1;
+		}
+		if (s.isKeyDown('d')) {
+			force.x += 1;
+		}
+		if (s.isKeyDown('s')) {
+			force.y -= 1;
+		}
+		if (s.isKeyDown('w')) {
+			force.y += 1;
+		}
+		force = glm::normalize(force) * 2000.f;
+		if (force.x == force.x && force.y == force.y) {
+			_player->applyForce(force);
+		}
+		std::set<Spite::SoftBody*> bodies(_enemies.begin(), _enemies.end());
+		bodies.insert(_player);
+		std::set<Spite::SoftBody*> updated;
+		bool hit = false;
+		for (auto e1 = bodies.begin(); e1 != bodies.end(); e1++) {
+			updated.insert(*e1);
+			if ((*e1) != _player) {
+				glm::vec2 dir = glm::normalize(_player->getPos() - (*e1)->getPos());
+				(*e1)->applyForce(dir * 1000.f);
+			}
+			for (auto e2 = bodies.begin(); e2 != bodies.end(); e2++) {
+				if (updated.count(*e2) > 0) {
+					continue;
+				}
+				glm::vec2 delta = (*e2)->getPos() - (*e1)->getPos();
+				glm::vec2 dir = glm::normalize(delta);
+				float radii = (*e2)->getRadius() + (*e1)->getRadius();
+				float dist = glm::length(delta);
+				if (dist * dist < radii * radii) {
+					if (*e1 == _player || *e2 == _player) {
+						hit = true;
+					}
+					glm::vec2 pointOfContact = (*e1)->getPos() + delta * (*e1)->getRadius() / radii;
+					glm::vec2 deltaV = (*e1)->getCenter().getVelocity() - (*e2)->getCenter().getVelocity();
+					float radius = std::cos((dist - std::max((*e1)->getRadius(), (*e2)->getRadius())) / std::min((*e1)->getRadius(), (*e2)->getRadius()) * PI / 2.f) * std::min((*e1)->getRadius(), (*e2)->getRadius()) + 5.f;
+					glm::vec2 force = dir * (radii / dist + 0.1f) * 4500.f;
+					(*e1)->knockback(pointOfContact, radius, -force);
+					(*e2)->knockback(pointOfContact, radius, force);
+				}
+			}
+		}
+		if (hit) {
+			float hp = (_health.find(_player)->second -= dt);
+			if (hp <= 0) {
+				hp = 0;
+				_dead = true;
+			}
+			_player->setColor({ 0.8, hp / 5.f, hp / 5.f, 1.0 });
+		}
+		_player->update(dt);
+		_cameraTarget = _player->getPos() - _screenSize / 2.f;
+
+		glm::vec2 cameraDelta = _camera - _cameraTarget;
+		_camera -= cameraDelta * (float)std::pow(0.001, dt);
+
+
+		for (auto e1 = _enemies.begin(); e1 != _enemies.end(); e1++) {
+			(*e1)->update(dt);
+			glm::vec2 pos = (*e1)->getPos();
+		}
+		float invert = s.isKeyDown(32) ? -1 : 1;
+		if (s.isKeyDown(256 + GLUT_KEY_LEFT)) {
+			_player->knockback(_player->getPos() + glm::vec2(-32, 0), 10, glm::vec2(-3000, 0) * invert);
+		}
+		_background->setPos(-glm::mod(_camera, glm::vec2(512.f)));
+		auto line = _lines.begin();
+		while (line != _lines.end()) {
+			(*line)->setColor((*line)->getColor() - glm::vec4(0, 0, 0, dt));
+			if ((*line)->getColor().a < 0.0) {
+				delete* line;
+				line = _lines.erase(line);
+			}
+			else {
+				line++;
+			}
+		}
 	}
-	glm::vec2 ballPos = _ball->getPos();
-	float t = (((int)(timer * 1000.0)) % 2000) / 1000.0;
-	float baseHeight = _screenSize.y / 5.0;
-	float ballHeight = baseHeight + 500 * t - 250 * t * t;
-	ballPos.y = ballHeight;
-	if (s.isDown('a') || s.isDown(GLUT_KEY_LEFT + 256)) {
-		ballPos.x -= 200.0 * dt;
-	}
-	if (s.isDown('d') || s.isDown(GLUT_KEY_RIGHT + 256)) {
-		ballPos.x += 200.0 * dt;
-	}
-	ballPos.x = std::max(std::min(ballPos.x, _screenSize.x - 50.0f), 50.0f);
-	_ball->setPos(ballPos);
-	
-	float ballScale = std::min(ballHeight / 200.0, 1.0);
-	_ball->setScale(glm::vec2(50.0 / ballScale, 50.0 * ballScale));
-	float shadowScale = ballHeight / baseHeight / 1.8;
-	_shadow->setPos(glm::vec2(ballPos.x, baseHeight - ballHeight / 10.0));
-	_shadow->setScale(glm::vec2(50.0 * shadowScale, 35.0 * shadowScale));
 }
 
 void MainScene::draw()
 {
-	_sky->draw();
-	_grass->draw();
-	for (const auto &it : _mountains) {
-		it->draw();
+	Spite::Spite& s = Spite::Spite::get();
+	if (_dead) {
+		s.setColor({ 0.5, 0.5, 0.5, 1 });
+	} else if (_pause) {
+		s.setColor({ 0.75, 0.75, 0.75, 1 });
 	}
-	for (const auto& it : _poles) {
-		it->draw();
+	else {
+		s.setColor({ 1,1,1,1 });
 	}
-	for (const auto& it : _fans) {
-		it->draw();
+	_background->draw();
+	s.pushTransforms();
+	s.translate(-_camera);
+	(_player)->draw();
+	for (auto e1 = _enemies.begin(); e1 != _enemies.end(); e1++) {
+		(*e1)->draw();
 	}
-	_shadow->draw();
-	_ball->draw();
-	_flare->draw();
-	_sun->draw();
+	for (auto l = _lines.begin(); l != _lines.end(); l++) {
+		(*l)->draw();
+	}
+	s.popTransforms();
+
+
+	GLuint err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		std::cout << glewGetErrorString(err) << std::endl;
+	}
 }
 
 void MainScene::mousePressed(const int b, const int x, const int y)
 {
+	if (_dead || _pause) return;
+	static float lastShot = 0;
+	switch (b) {
+	case GLUT_RIGHT_BUTTON:
+	{
+		Spite::SoftBody* enemy = new Spite::SoftBody(SEGMENTS, 32, glm::vec2(x,  y) - _screenSize / 2.f + _player->getPos(), SPRINGFORCE);
+		_health.insert({ enemy, 3 });
+		enemy->setColor({ 0.0, 0.8, 0.0, 1.0 });
+		_enemies.push_back(enemy);
+		break;
+	}
+	case GLUT_LEFT_BUTTON:
+		glm::vec2 pos = _player->getPos();
+		glm::vec2 mouse = glm::vec2(x, y) + _camera;
+		std::cout << mouse.x << " " << mouse.y << std::endl;
+		if (_time - lastShot < 0.5f) return;
+		lastShot = _time;
+		if (pos == mouse) return;
+		glm::vec2 dir = glm::normalize(mouse - pos);
+		Spite::SoftBody *closest = nullptr;
+		float closestDistance = std::numeric_limits<float>::infinity();
+		float distanceToLine;
+
+		for (auto e1 = _enemies.begin(); e1 != _enemies.end(); e1++) {
+			glm::vec2 epos = (*e1)->getPos();
+			float dot = glm::dot(epos - pos, dir);
+			if (dot < 0) continue;
+			float distance = std::abs((mouse.x - pos.x) * (pos.y - epos.y) - (pos.x - epos.x) * (mouse.y - pos.y)) / glm::length(mouse - pos);
+			if (dot < closestDistance && distance < (*e1)->getRadius()) {
+				closestDistance = dot;
+				closest = (*e1);
+				distanceToLine = distance;
+			}
+		}
+		if (closest == nullptr) {
+			_lines.push_back(new Spite::Line({ {pos, 0.0}, {1.0,1.0,1.0,1.0}, {0.0,0.0 } }, { {pos + dir * glm::length(_screenSize), 0.0}, {1.0,1.0,1.0,1.0}, {0.0,0.0} }));
+			return;
+		}
+		glm::vec2 PoC = pos + dir * closestDistance - dir * std::sin(std::acos(distanceToLine / closest->getRadius())) * closest->getRadius();
+		_lines.push_back(new Spite::Line({ {pos, 0.0}, {1.0,1.0,1.0,1.0}, {0.0,0.0 } }, { {PoC, 0.0}, {1.0,1.0,1.0,1.0}, {0.0,0.0} }));
+		closest->knockback(PoC, closest->getRadius(), dir * 50000.f);
+		closest->applyForce(dir * 50000.f);
+		auto hp = _health.find(closest);
+		if (hp != _health.end()) {
+			hp->second--;
+			if (hp->second == 0) {
+				_enemies.remove(closest);
+			}
+			else {
+				std::cout << (3 - hp->second) * 0.4f << std::endl;
+				closest->setColor({(3 - hp->second) * 0.4f, 0.8, 0.0, 1.0 });
+			}
+		}
+		break;
+	}
 }
 
 void MainScene::mouseReleased(const int b, const int x, const int y)
@@ -111,6 +253,19 @@ void MainScene::keyPressed(const int key)
 
 void MainScene::keyReleased(const int key)
 {
+	switch (key) {
+	case 27:
+		if (_dead)
+			glutLeaveMainLoop();
+		_pause = !_pause;
+		break;
+	case 'r':
+		if (_dead)
+			Spite::Spite::get().loadScene(new MainScene());
+		break;
+	default:
+		break;
+	}
 }
 
 void MainScene::resize(const int width, const int height)

@@ -5,6 +5,8 @@
 #include "EmptyScene.h"
 #include "ShaderMaker.h"
 
+#include <iostream>
+
 Spite::Spite::Spite()
 {
 	_scene = std::make_unique<EmptyScene>();
@@ -17,12 +19,14 @@ void Spite::Spite::start(int* argcp, char* argv[], int width, int height, const 
 	glutInitContextVersion(4, 0);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_STENCIL);
+
 
 	glutInitWindowSize(width, height);
 	_width = width;
 	_height = height;
 	glutCreateWindow(title);
+	std::cout << "HEY" << std::endl;
 	glutDisplayFunc(Spite::Spite::draw);
 	glutTimerFunc(16, Spite::Spite::timer, 0);
 	
@@ -48,7 +52,16 @@ void Spite::Spite::start(int* argcp, char* argv[], int width, int height, const 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	_projection = glm::ortho(0.0f, float(width), 0.0f, float(height));
+	_transforms = glm::mat4(1.0);
+	
+	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalExt = (PFNWGLSWAPINTERVALEXTPROC) wglGetProcAddress("wglSwapIntervalEXT");
+	wglSwapIntervalExt(1);
+
+	initEmptyTexture();
 	loadScene(scene);
+	glActiveTexture(GL_TEXTURE0);
+	glutTimerFunc(0, Spite::Spite::timer, 0);
+	setColor({ 1.0, 1.0, 1.0, 1.0 });
 	glutMainLoop();
 }
 
@@ -58,20 +71,40 @@ void Spite::Spite::loadScene(Scene *scene)
 	_scene->load(_width, _height);
 }
 
-bool Spite::Spite::isDown(const int key)
+bool Spite::Spite::isKeyDown(const int key)
 {
 	return _keys.count(key) > 0;
 }
+
+glm::vec2 Spite::Spite::getMousePosition()
+{
+	return _mouse;
+}
+
 
 void Spite::Spite::sendModel(glm::mat4 model)
 {
 	glUniformMatrix4fv(glGetUniformLocation(_shader, "Model"), 1, GL_FALSE, value_ptr(model));
 }
 
+void Spite::Spite::setColor(glm::vec4 c)
+{
+	glUniform4fv(glGetUniformLocation(_shader, "color"), 1, value_ptr(c));
+	std::cout << "COLOR" << std::endl;
+}
+
 Spite::Spite &Spite::Spite::get()
 {
 	static Spite spite;
 	return spite;
+}
+
+void Spite::Spite::initEmptyTexture()
+{
+	glGenTextures(1, &_emptyTexture);
+	glBindTexture(GL_TEXTURE_2D, _emptyTexture);
+	unsigned char white[] = { 255, 255, 255 };
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, white);
 }
 
 void Spite::Spite::timer(int a)
@@ -81,13 +114,17 @@ void Spite::Spite::timer(int a)
 	
 	Spite::get()._scene->update(std::chrono::duration_cast<std::chrono::duration<float>>(time - oldTime).count());
 
+	std::chrono::steady_clock::time_point time2 = std::chrono::steady_clock::now();
+	//std::cout << "Update:\t" << std::chrono::duration_cast<std::chrono::duration<float>>(time2 - time).count() << std::endl;
+
 	glutPostRedisplay();
-	glutTimerFunc(16, Spite::Spite::timer, 0);
+	//glutTimerFunc(16, Spite::Spite::timer, 0);
 	oldTime = time;
 }
 
 void Spite::Spite::mouse(int button, int state, int x, int y)
 {
+	y = get()._height - y;
 	switch (state) {
 	case GLUT_DOWN:
 		Spite::get()._scene->mousePressed(button, x, y);
@@ -100,22 +137,37 @@ void Spite::Spite::mouse(int button, int state, int x, int y)
 
 void Spite::Spite::motion(int x, int y)
 {
-	static int mx = 0, my = 0, first = 1;
+	y = get()._height - y;
+	static int first = 1;
 	if (!first)
-		Spite::get()._scene->mouseMoved(x, y, x - mx, y - my);
+		Spite::get()._scene->mouseMoved(x, y, x - Spite::get()._mouse.x, y - Spite::get()._mouse.y);
 	first = 0;
-	mx = x;
-	my = y;
+	Spite::get()._mouse.x = x;
+	Spite::get()._mouse.y = y;
 }
 
 void Spite::Spite::draw()
 {
-	glutPostRedisplay();
-
 	glClear(GL_COLOR_BUFFER_BIT);
-	glUniformMatrix4fv(glGetUniformLocation(Spite::get()._shader, "Projection"), 1, GL_FALSE, value_ptr(Spite::get()._projection));
+	Spite::get().updateMatrix();
+	std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 	Spite::get()._scene->draw();
+	std::chrono::steady_clock::time_point time2 = std::chrono::steady_clock::now();
+	//std::cout << "Draw:\t" << std::chrono::duration_cast<std::chrono::duration<float>>(time2 - time).count() << std::endl;
 	glutSwapBuffers();
+
+	GLenum err;
+	while (1) {
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			std::cout << gluErrorStringWIN(err) << std::endl;
+		}
+		else {
+			break;
+		}
+	}
+	//glutTimerFunc(1, Spite::Spite::timer, 0);
+	Spite::Spite::timer(0);
 }
 
 void Spite::Spite::keyboard(unsigned char key, int x, int y)
@@ -153,4 +205,40 @@ void Spite::Spite::reshape(int width, int height)
 	s._width = width;
 	s._height = height;
 	s._projection = glm::ortho(0.0f, float(width), 0.0f, float(height));
+	glViewport(0, 0, width, height);
+	s.updateMatrix();
+}
+
+void Spite::Spite::updateMatrix()
+{
+	glm::mat4 matrix = _projection * _transforms;
+	glUniformMatrix4fv(glGetUniformLocation(_shader, "Projection"), 1, GL_FALSE, value_ptr(matrix));
+}
+
+void Spite::Spite::translate(glm::vec2 t)
+{
+	_transforms = glm::translate(_transforms, glm::vec3(t, 0.0));
+	updateMatrix();
+}
+
+void Spite::Spite::origin()
+{
+	_transforms = glm::mat4(1.0);
+}
+
+void Spite::Spite::pushTransforms()
+{
+	_transformStack.push(_transforms);
+}
+
+void Spite::Spite::popTransforms()
+{
+	_transforms = _transformStack.top();
+	_transformStack.pop();
+	updateMatrix();
+}
+
+GLuint Spite::Spite::getEmptyTexture()
+{
+	return _emptyTexture;
 }

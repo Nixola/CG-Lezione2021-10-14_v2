@@ -8,6 +8,7 @@ namespace Spite {
 	{
 	private:
 		glm::mat4 _matrix;
+		glm::mat4 _base;
 
 		glm::vec2 _pos;
 		glm::vec2 _scale;
@@ -35,6 +36,7 @@ namespace Spite {
 		void set(glm::vec2 pos, glm::vec2 scale, float angle, glm::vec2 offset);
 
 		Model(void);
+		Model(glm::mat4 base);
 		Model(glm::vec2 pos);
 		Model(glm::vec2 pos, glm::vec2 scale);
 		Model(glm::vec2 pos, glm::vec2 scale, float angle);

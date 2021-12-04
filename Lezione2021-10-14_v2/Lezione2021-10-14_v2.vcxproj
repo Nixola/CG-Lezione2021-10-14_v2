@@ -144,23 +144,41 @@
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="EmptyScene.cpp" />
     <ClCompile Include="Fan.cpp" />
+    <ClCompile Include="HermiteCurve.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainScene.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Point.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderMaker.cpp" />
+    <ClCompile Include="SoftBody.cpp" />
     <ClCompile Include="Spite.cpp" />
+    <ClCompile Include="Spring.cpp" />
+    <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circle.h" />
+    <ClInclude Include="dirt4.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="EmptyScene.h" />
     <ClInclude Include="Fan.h" />
+    <ClInclude Include="HermiteCurve.h" />
+    <ClInclude Include="Line.h" />
+    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="MainScene.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Point.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderMaker.h" />
+    <ClInclude Include="SoftBody.h" />
     <ClInclude Include="Spite.h" />
+    <ClInclude Include="Spring.h" />
+    <ClInclude Include="wglext.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader_M.glsl" />
